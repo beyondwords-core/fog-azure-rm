@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'fog/azurerm/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'gitlab-fog-azure-rm'
+  spec.name          = 'fog-azure-rm.gemspec'
   spec.version       = Fog::AzureRM::VERSION
   spec.authors       = ['Shaffan Chaudhry', 'Samawia Moin', 'Adnan Khalil', 'Zeeshan Arshad', 'Haider Ali', 'Waqar Haider', 'Bilal Naeem', 'Muhammad Asad', 'Azeem Sajid', 'Maham Nazir', 'Abbas Sheikh']
   spec.summary       = "Module for the 'fog' gem to support Azure Blob Storage with CarrierWave and Fog."
@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.test_files = `git ls-files -- {spec,tests}/*`.split("\n")
   spec.require_paths = %w[lib]
   spec.license  = 'MIT'
-  spec.homepage = 'https://gitlab.com/gitlab-org/gitlab-fog-azure-rm'
+  spec.homepage = 'https://github.com/fog/fog-azure-rm'
   spec.rdoc_options = %w[--charset=UTF-8]
   spec.extra_rdoc_files = %w[README.md]
   spec.required_ruby_version = '>= 2.7.0'

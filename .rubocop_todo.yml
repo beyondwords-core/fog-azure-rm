@@ -11,7 +11,7 @@
 # Include: **/*.gemspec
 Gemspec/RequiredRubyVersion:
   Exclude:
-    - 'gitlab-fog-azure-rm.gemspec'
+    - 'fog-azure-rm.gemspec'
 
 # Offense count: 23
 # Cop supports --auto-correct.
@@ -57,7 +57,7 @@ Layout/SpaceAroundEqualsInParameterDefault:
 # Cop supports --auto-correct.
 Layout/SpaceBeforeComma:
   Exclude:
-    - 'gitlab-fog-azure-rm.gemspec'
+    - 'fog-azure-rm.gemspec'
 
 # Offense count: 2
 Lint/DuplicateMethods:
@@ -139,7 +139,7 @@ Style/AccessorGrouping:
 # Cop supports --auto-correct.
 Style/ExpandPathArguments:
   Exclude:
-    - 'gitlab-fog-azure-rm.gemspec'
+    - 'fog-azure-rm.gemspec'
     - 'lib/fog/azurerm/utilities/general.rb'
 
 # Offense count: 2
@@ -254,7 +254,7 @@ Style/StringConcatenation:
 # SupportedStyles: single_quotes, double_quotes
 Style/StringLiterals:
   Exclude:
-    - 'gitlab-fog-azure-rm.gemspec'
+    - 'fog-azure-rm.gemspec'
 
 # Offense count: 9
 # Cop supports --auto-correct.
