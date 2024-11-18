@@ -1,14 +1,12 @@
 # Integration Tests
 
-To run Integration Tests, first enter following information from your Azure subscription in **credentials\azure.yml** file:
+To run Integration Tests, first enter the following information for your test storage account into **credentials\azure.yml** file:
 
-- tenant_id
-- client_id
-- client_secret
-- subscription_id
+- `azure_storage_account_name`
+- `azure_storage_access_key`
 
-Then run **ruby file_name.rb** to run integration test for a specific service e.g. For integration tests of storage account, run:
+Then run **bundle exec ruby file_name.rb** to run integration test for a specific service e.g. For integration tests for blobs, run:
 
-**ruby storage_account.rb**
+**bundle exec ruby test/integration/blob.rb**
 
 Also make sure the **DEBUG** flag is set in your fog environment to see proper logging.

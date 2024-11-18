@@ -1,13 +1,15 @@
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class is giving implementation of listing containers.
       class Directories < Fog::Collection
-        model Fog::Storage::AzureRM::Directory
+        include Fog::AzureRM::Utilities::General
+
+        model Fog::AzureRM::Storage::Directory
 
         # List all directories(containers) in the storage account.
         #
-        # @return [Fog::Storage::AzureRM::Directories]
+        # @return [Fog::AzureRM::Storage::Directories]
         #
         def all
           containers = service.list_containers
@@ -33,7 +35,7 @@ module Fog
         # @option options [String]  marker      Sets the identifier that specifies the portion of the list to be returned.
         # @option options [String]  prefix      Sets filters the results to return only files whose name begins with the specified prefix.
         #
-        # @return [Fog::Storage::AzureRM::Directory] A directory. Return nil if the directory does not exist.
+        # @return [Fog::AzureRM::Storage::Directory] A directory. Return nil if the directory does not exist.
         #
         def get(identity, options = {})
           remap_attributes(options, max_keys: :max_results)
@@ -62,7 +64,7 @@ module Fog
         end
 
         def delete_temporary_container(storage_account_name, access_key, container_name)
-          storage_data = Fog::Storage::AzureRM.new(azure_storage_account_name: storage_account_name, azure_storage_access_key: access_key)
+          storage_data = Fog::AzureRM::Storage.new(azure_storage_account_name: storage_account_name, azure_storage_access_key: access_key)
           storage_data.delete_container(container_name)
         end
 

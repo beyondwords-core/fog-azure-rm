@@ -5,12 +5,12 @@ class TestDeleteContainer < Minitest::Test
   # This class posesses the test cases for the requests of deleting storage containers.
   def setup
     Fog.mock!
-    @mock_service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @mock_service = Fog::AzureRM::Storage.new(storage_account_credentials)
     Fog.unmock!
     @mocked_response = mocked_storage_http_error
     @mocked_not_found_response = mocked_storage_http_not_found_error
 
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
     @blob_client = @service.instance_variable_get(:@blob_client)
   end
 

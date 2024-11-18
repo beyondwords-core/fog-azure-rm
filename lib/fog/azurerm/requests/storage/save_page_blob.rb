@@ -1,6 +1,6 @@
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class provides the actual implementation for service calls.
       class Real
         # This class is used to store chunk data for page blob before uploading.
@@ -56,7 +56,7 @@ module Fog
 
         def save_page_blob(container_name, blob_name, body, options)
           threads_num = options.delete(:worker_thread_num)
-          threads_num = UPLOAD_BLOB_WORKER_THREAD_COUNT if threads_num.nil? || !threads_num.is_a?(Integer) || threads_num < 1
+          threads_num = Fog::AzureRM::UPLOAD_BLOB_WORKER_THREAD_COUNT if threads_num.nil? || !threads_num.is_a?(Integer) || threads_num < 1
 
           begin
             blob_size = Fog::Storage.get_body_size(body)
@@ -74,9 +74,9 @@ module Fog
             threads_num.times do |id|
               thread = Thread.new do
                 Fog::Logger.debug "Created upload thread #{id}."
-                while (chunk = iostream.read(MAXIMUM_CHUNK_SIZE))
+                while (chunk = iostream.read(Fog::AzureRM::MAXIMUM_CHUNK_SIZE))
                   Fog::Logger.debug "Upload thread #{id} is uploading #{chunk.id}, start_range: #{chunk.start_range}, size: #{chunk.data.size}."
-                  put_blob_pages(container_name, blob_name, chunk.start_range, chunk.end_range, chunk.data, options) if Digest::MD5.hexdigest(chunk.data) != HASH_OF_4MB_EMPTY_CONTENT
+                  put_blob_pages(container_name, blob_name, chunk.start_range, chunk.end_range, chunk.data, options) if Digest::MD5.hexdigest(chunk.data) != Fog::AzureRM::HASH_OF_4MB_EMPTY_CONTENT
                 end
                 Fog::Logger.debug "Upload thread #{id} finished."
               end

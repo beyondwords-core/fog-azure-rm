@@ -1,0 +1,42 @@
+require File.expand_path '../../test_helper', __dir__
+
+# Storage Blob Class
+class TestDeleteObject < Minitest::Test
+  # This class posesses the test cases for the requests of deleting storage blobs.
+  def setup
+    Fog.mock!
+    @mock_service = Fog::AzureRM::Storage.new(storage_account_credentials)
+    Fog.unmock!
+    @mocked_response = mocked_storage_http_error
+    @mocked_not_found_response = mocked_storage_http_not_found_error
+
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
+    @blob_client = @service.instance_variable_get(:@blob_client)
+  end
+
+  def test_delete_object_success
+    @blob_client.stub :delete_blob, true do
+      assert @service.delete_object('test_container', 'test_blob')
+    end
+  end
+
+  def test_delete_object_with_not_found_success
+    http_exception = ->(*) { raise Azure::Core::Http::HTTPError.new(@mocked_not_found_response) }
+    @blob_client.stub :delete_blob, http_exception do
+      assert @service.delete_object('test_container', 'test_blob')
+    end
+  end
+
+  def test_delete_object_http_exception
+    http_exception = ->(*) { raise Azure::Core::Http::HTTPError.new(@mocked_response) }
+    @blob_client.stub :delete_blob, http_exception do
+      assert_raises(Azure::Core::Http::HTTPError) do
+        @service.delete_object('test_container', 'test_blob')
+      end
+    end
+  end
+
+  def test_delete_object_mock
+    assert @mock_service.delete_blob('test_container', 'test_blob')
+  end
+end

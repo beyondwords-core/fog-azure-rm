@@ -5,11 +5,11 @@ class TestCreateBlockBlob < Minitest::Test
   # This class posesses the test cases for the requests of creating block blob.
   def setup
     Fog.mock!
-    @mock_service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @mock_service = Fog::AzureRM::Storage.new(storage_account_credentials)
     Fog.unmock!
     @mocked_response = mocked_storage_http_error
 
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
     @blob_client = @service.instance_variable_get(:@blob_client)
 
     @block_blob = ApiStub::Requests::Storage::File.block_blob
@@ -48,15 +48,6 @@ class TestCreateBlockBlob < Minitest::Test
             assert_equal @block_blob, @service.create_block_blob('test_container', 'test_blob', body)
           end
         end
-      end
-    end
-  end
-
-  def test_create_block_blob_exceed_max_body_size
-    data = []
-    data.stub :size, 64 * 1024 * 1024 + 1 do
-      assert_raises(ArgumentError) do
-        @service.create_block_blob('test_container', 'test_blob', data)
       end
     end
   end

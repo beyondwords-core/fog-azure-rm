@@ -1,6 +1,6 @@
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class provides the actual implementation for service calls.
       class Real
         def get_container_acl(container_name, options = {})

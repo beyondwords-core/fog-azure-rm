@@ -1,9 +1,9 @@
 require File.expand_path '../../test_helper', __dir__
 
 # Test class for Storage Container Model
-class TestFile < Minitest::Test
+class TestFile < Minitest::Test # rubocop:disable Metrics/ClassLength
   def setup
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
     @directory = directory(@service)
     @file = file(@service)
     @raw_cloud_blob = storage_blob
@@ -76,10 +76,8 @@ class TestFile < Minitest::Test
   def test_save_method_with_large_block_blob_success
     @file.body = 'd' * (32 * 1024 * 1024 + 1) # SINGLE_BLOB_PUT_THRESHOLD is 32 * 1024 * 1024
 
-    @service.stub :multipart_save_block_blob, true do
-      @service.stub :get_blob_properties, @raw_cloud_blob do
-        assert @file.save
-      end
+    @service.stub :create_block_blob, @raw_cloud_blob do
+      assert @file.save
     end
   end
 
@@ -173,7 +171,7 @@ class TestFile < Minitest::Test
       @service.stub :copy_blob, [copy_id, copy_status] do
         @service.stub :wait_blob_copy_operation_to_finish, true do
           target_file = @file.copy('target_container', 'target_blob')
-          assert_instance_of Fog::Storage::AzureRM::File, target_file
+          assert_instance_of Fog::AzureRM::Storage::File, target_file
         end
       end
     end
@@ -282,6 +280,30 @@ class TestFile < Minitest::Test
   def test_url_method_success
     @file.collection.stub :get_url, @blob_https_url do
       assert @file.url(Time.now + 3600), @blob_https_url
+    end
+  end
+
+  def test_url_method_with_content_disposition
+    @file.collection.stub :get_url, @blob_https_url, { content_disposition: 'attachment' } do
+      assert @file.url(Time.now + 3600, content_disposition: 'attachment'), @blob_https_url
+    end
+  end
+
+  def test_url_method_with_response_content_disposition
+    fake = Minitest::Mock.new
+    expiry = Time.now + 3600
+    fake.expect :call, nil, [@file.key, expiry, { content_disposition: 'attachment', content_type: nil }]
+    @file.collection.stub(:get_url, fake) do
+      @file.url(expiry, { query: { 'response-content-disposition' => 'attachment' } })
+    end
+  end
+
+  def test_url_method_with_response_content_type
+    fake = Minitest::Mock.new
+    expiry = Time.now + 3600
+    fake.expect :call, nil, [@file.key, expiry, { content_disposition: nil, content_type: 'image/png' }]
+    @file.collection.stub(:get_url, fake) do
+      @file.url(expiry, { query: { 'response-content-type' => 'image/png' } })
     end
   end
 

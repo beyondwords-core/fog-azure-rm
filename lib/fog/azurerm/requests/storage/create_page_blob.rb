@@ -1,6 +1,6 @@
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class provides the actual implementation for service calls.
       class Real
         def create_page_blob(container_name, blob_name, blob_size, options = {})

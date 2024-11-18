@@ -1,6 +1,6 @@
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class provides the actual implementation for service calls.
       class Real
         def put_blob_metadata(container_name, name, metadata, options = {})

@@ -5,11 +5,11 @@ class TestCopyBlob < Minitest::Test
   # This class posesses the test cases for the requests of copying blobs.
   def setup
     Fog.mock!
-    @mock_service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @mock_service = Fog::AzureRM::Storage.new(storage_account_credentials)
     Fog.unmock!
     @mocked_response = mocked_storage_http_error
 
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
     @blob_client = @service.instance_variable_get(:@blob_client)
 
     @blob_copy_result = ApiStub::Requests::Storage::File.blob_copy_result
@@ -18,6 +18,7 @@ class TestCopyBlob < Minitest::Test
   def test_copy_blob_success
     @blob_client.stub :copy_blob, @blob_copy_result do
       assert_equal @blob_copy_result, @service.copy_blob('destination_container', 'destination_blob', 'source_container', 'source_blob')
+      assert_equal @blob_copy_result, @service.copy_object('destination_container', 'destination_blob', 'source_container', 'source_blob')
     end
   end
 
@@ -26,11 +27,13 @@ class TestCopyBlob < Minitest::Test
     @blob_client.stub :copy_blob, http_exception do
       assert_raises(Azure::Core::Http::HTTPError) do
         @service.copy_blob('destination_container', 'destination_blob', 'source_container', 'source_blob')
+        @service.copy_object('destination_container', 'destination_blob', 'source_container', 'source_blob')
       end
     end
   end
 
   def test_copy_blob_mock
     assert_equal @blob_copy_result, @mock_service.copy_blob('destination_container', 'destination_blob', 'source_container', 'source_blob')
+    assert_equal @blob_copy_result, @mock_service.copy_object('destination_container', 'destination_blob', 'source_container', 'source_blob')
   end
 end

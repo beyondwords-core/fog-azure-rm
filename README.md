@@ -6,6 +6,9 @@
 
 # Fog Azure Resource Manager
 
+NOTE: This is a fork of https://github.com/fog/fog-azure-rm and from https://gitlab.com/gitlab-org/ruby/gems/gitlab-fog-azure-rm. 
+This fork is used to support blob transfers with CarrierWave and Fog v2.
+
 This document describes how to get started with Fog using Microsoft Azure as a cloud resource management services provider.
 
 ## Pre-requisites

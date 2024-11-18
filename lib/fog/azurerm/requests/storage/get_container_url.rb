@@ -1,6 +1,6 @@
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class provides the actual implemention for service calls.
       class Real
         # Get a public container url from Azure storage container
@@ -11,7 +11,7 @@ module Fog
         #
         def get_container_url(container_name, options = {})
           query = { 'comp' => 'list', 'restype' => 'container' }
-          uri = @blob_client.generate_uri(container_name, query)
+          uri = @blob_client.generate_uri(container_name, query, { encode: true })
 
           if options[:scheme] == 'http'
             uri.to_s.gsub('https:', 'http:')
@@ -24,8 +24,8 @@ module Fog
       # This class provides the mock implementation for unit tests.
       class Mock
         def get_container_url(_container_name, options = {})
-          url = 'https://sa.blob.core.windows.net/test_container?comp=list&restype=container'
-          url.gsub!('https:', 'http:') if options[:scheme] == 'http'
+          url = 'https://mockaccount.blob.core.windows.net/test_container?comp=list&restype=container'
+          url.sub!('https:', 'http:') if options[:scheme] == 'http'
           url
         end
       end

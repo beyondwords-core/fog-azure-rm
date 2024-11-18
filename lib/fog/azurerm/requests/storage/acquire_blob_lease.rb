@@ -1,6 +1,6 @@
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class provides the actual implementation for service calls.
       class Real
         def acquire_blob_lease(container_name, name, options = {})

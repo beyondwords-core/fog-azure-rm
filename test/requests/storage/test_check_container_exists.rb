@@ -4,7 +4,7 @@ require File.expand_path '../../test_helper', __dir__
 class TestCheckContainerExists < Minitest::Test
   # This class posesses the test cases for the requests of checking container exists.
   def setup
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
     @blob_client = @service.instance_variable_get(:@blob_client)
 
     @container = ApiStub::Requests::Storage::Directory.container

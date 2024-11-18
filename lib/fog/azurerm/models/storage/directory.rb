@@ -1,9 +1,11 @@
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class is giving implementation of create and delete a container.
       class Directory < Fog::Model
         VALID_ACLS = ['container', 'blob', 'unknown', nil].freeze
+
+        include Fog::AzureRM::Utilities::General
 
         attr_writer :acl
 
@@ -71,10 +73,10 @@ module Fog
         # If you have set max_results or max_keys when getting this directory by directories.get,
         # files may be incomplete. You need to use files.all to get all files under this directory.
         #
-        # @return [Fog::Storage::AzureRM::Files] Files.
+        # @return [Fog::AzureRM::Storage::Files] Files.
         #
         def files
-          @files ||= Fog::Storage::AzureRM::Files.new(directory: self, service: service)
+          @files ||= Fog::AzureRM::Storage::Files.new(directory: self, service: service)
         end
 
         # Set the container permission to public or private

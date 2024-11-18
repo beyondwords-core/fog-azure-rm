@@ -5,19 +5,19 @@ class TestListContainers < Minitest::Test
   # This class posesses the test cases for the requests of listing storage containers.
   def setup
     Fog.mock!
-    @mock_service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @mock_service = Fog::AzureRM::Storage.new(storage_account_credentials)
     Fog.unmock!
     @mocked_response = mocked_storage_http_error
 
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
     @blob_client = @service.instance_variable_get(:@blob_client)
 
     @containers = ApiStub::Requests::Storage::Directory.container_list
-    @containers1 = Azure::Service::EnumerationResults.new
+    @containers1 = Azure::Storage::Common::Service::EnumerationResults.new
     @containers1.continuation_token = 'marker'
     @containers1.push(@containers[0])
     @containers1.push(@containers[1])
-    @containers2 = Azure::Service::EnumerationResults.new
+    @containers2 = Azure::Storage::Common::Service::EnumerationResults.new
     @containers2.push(@containers[2])
   end
 

@@ -5,11 +5,11 @@ class TestPutContainerACL < Minitest::Test
   # This class posesses the test cases for the requests of setting storage container acl.
   def setup
     Fog.mock!
-    @mock_service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @mock_service = Fog::AzureRM::Storage.new(storage_account_credentials)
     Fog.unmock!
     @mocked_response = mocked_storage_http_error
 
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
     @blob_client = @service.instance_variable_get(:@blob_client)
   end
 

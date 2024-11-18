@@ -37,7 +37,7 @@ module ApiStub
         end
 
         def self.container_https_url
-          'https://sa.blob.core.windows.net/test_container?comp=list&restype=container'
+          'https://mockaccount.blob.core.windows.net/test_container?comp=list&restype=container'
         end
 
         def self.container_metadata

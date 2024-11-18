@@ -5,11 +5,11 @@ class TestSavePageBlob < Minitest::Test
   # This class posesses the test cases for the requests of saving storage page blob.
   def setup
     Fog.mock!
-    @mock_service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @mock_service = Fog::AzureRM::Storage.new(storage_account_credentials)
     Fog.unmock!
     @mocked_response = mocked_storage_http_error
 
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
   end
 
   def test_save_page_blob_success

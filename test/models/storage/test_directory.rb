@@ -3,7 +3,7 @@ require File.expand_path '../../test_helper', __dir__
 # Test class for Storage Container Model
 class TestDirectory < Minitest::Test
   def setup
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
     @directory = directory(@service)
 
     @container = ApiStub::Models::Storage::Directory.container
@@ -100,7 +100,7 @@ class TestDirectory < Minitest::Test
   end
 
   def test_files_method_success
-    assert_instance_of Fog::Storage::AzureRM::Files, @directory.files
+    assert_instance_of Fog::AzureRM::Storage::Files, @directory.files
   end
 
   def test_set_public_method_success

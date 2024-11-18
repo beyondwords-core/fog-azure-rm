@@ -1,6 +1,6 @@
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class provides the actual implementation for service calls.
       class Real
         def create_block_blob(container_name, blob_name, body, options = {})
@@ -8,37 +8,9 @@ module Fog
           msg = "create_block_blob #{blob_name} to the container #{container_name}. options: #{options}"
           Fog::Logger.debug msg
 
-          begin
-            if body.nil?
-              data = nil
-            elsif body.respond_to?(:read)
-              if body.respond_to?(:rewind)
-                begin
-                  body.rewind
-                rescue
-                  nil
-                end
-              end
-              data = body.read
-            else
-              data = Fog::Storage.parse_data(body)
-              options[:content_length] = data[:headers]['Content-Length']
-              options[:content_type] = data[:headers]['Content-Type']
-              data = data[:body]
-            end
-
-            raise ArgumentError.new('The maximum size for a block blob created via create_block_blob is 64 MB.') if !data.nil? && Fog::Storage.get_body_size(data) > 64 * 1024 * 1024
-            blob = @blob_client.create_block_blob(container_name, blob_name, data, options)
-          rescue Azure::Core::Http::HTTPError => ex
-            raise_azure_exception(ex, msg)
-          end
-
-          if data.nil?
-            Fog::Logger.debug "Create a block blob #{blob_name} successfully."
-          else
-            Fog::Logger.debug "Upload a block blob #{blob_name} successfully."
-          end
-          blob
+          @blob_client.create_block_blob(container_name, blob_name, body, options)
+        rescue Azure::Core::Http::HTTPError => ex
+          raise_azure_exception(ex, msg)
         end
       end
 

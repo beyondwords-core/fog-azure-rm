@@ -1,6 +1,6 @@
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class provides the actual implementation for service calls.
       class Real
         def copy_blob_from_uri(destination_container, destination_blob, source_blob_uri, options = {})

@@ -1,13 +1,101 @@
+## Unreleased
+
+## 2.1.0
+
+- Drop IPAddr patches !52
+
+## 2.0.1
+
+- Remove vendor directory and copy files into lib/azure !50
+
+## 2.0.0
+
+- Vendor Microsoft Azure gems and upgrade to Faraday 2 !48
+
+## 1.9.1
+
+- Duplicate options after modifying it !47
+
+## 1.9.0
+
+- Cleanup dead code and tests !41
+- Preserve compressed response bodies when reading blobs !42
+- Add support for using a token signer instead of an account access key !43
+- Support setting Content-Type in pre-signed URLs !44
+
+## 1.8.0
+
+- Remove deprecated ms_rest_azure dependency (thanks to @jasoncodes) !38
+
+## 1.7.0
+
+- Fix #get_object return type to be consistent with other Fog providers !36
+- Require Ruby 2.7+ !36
+
+## 1.6.0
+
+- Add get_object request method !34
+- Fix uninitialized constant errors !35
+
+## 1.5.0
+
+- Add delete_object request method !32
+
+## 1.4.0
+
+-  Move all top-level constants and functions to Fog::AzureRM !30
+
+## 1.3.0
+
+- Fix Ruby 3.0 compatibility !27
+
+## 1.2.0
+
+- Support setting returned Content-Disposition in GetBlob requests !25
+
+## 1.1.1
+
+- Remove trailing periods per path segment when retrieving blob URLs !23
+
+## 1.1.0
+
+- Yanked
+
+## 1.0.1
+
+- Fix URL generation for files with UTF-8 characters !21
+
+## 1.0.0
+
+- Fix multipart uploads not working and drop multipart_save_block_blob !19
+
+## 0.9.0
+
+- Fix TimeoutError deprecation !17
+- Update Azure storage libraries !16
+
+## 0.8.1
+
+- Fix `azure_storage_domain` not getting propagated properly !14
+
+## 0.8.0
+
+- Add `azure_storage_domain` for specifying custom domain !11
+
+## 0.7.0
+
+- Loosen mime-types version dependency !9
+- Drop azure_mgmt_storage and other dependencies !8
+
 ## 0.6.0
 
-**Changed:**
-- Updated dependency of mime-types to (~> 3.0)
-- Updated dependency of rake to (>= 12.3.3)
-
-## 0.5.3
-
-**Fixed**
-- Added Null Check for `path_params` hash for `AzureOperationError` Request Headers
+- Fix get_object_url !7
+- Add get_object_url method !6
+- Add support for copy_object !5
+- Add support for DELETE blob !4
+- Add support for PUT blobs !3
+- Add and update Rubocop files !2
+- Delete all code except blob storage-related functionality !1
 
 ## 0.5.2
 

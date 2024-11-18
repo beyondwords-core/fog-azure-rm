@@ -3,7 +3,7 @@ require File.expand_path '../../test_helper', __dir__
 # Test class for Blob Collection
 class TestFiles < Minitest::Test
   def setup
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
     @directory = directory(@service)
     @files = @directory.files
 
@@ -49,7 +49,7 @@ class TestFiles < Minitest::Test
     @service.stub :get_container_properties, @container do
       @service.stub :list_blobs, @blob_list do
         files = @files.all
-        assert_instance_of Fog::Storage::AzureRM::Files, files
+        assert_instance_of Fog::AzureRM::Storage::Files, files
         assert_equal @blob_list[:blobs].size, files.size
       end
     end
@@ -76,7 +76,7 @@ class TestFiles < Minitest::Test
         @files.next_marker = nil
         j = 0
         @files.each do |file|
-          assert_instance_of Fog::Storage::AzureRM::File, file
+          assert_instance_of Fog::AzureRM::Storage::File, file
           j += 1
         end
         assert_equal @blob_list[:blobs].size, j
@@ -85,7 +85,7 @@ class TestFiles < Minitest::Test
   end
 
   def test_each_method_with_parts
-    assert_instance_of Fog::Storage::AzureRM::Files, @files.each
+    assert_instance_of Fog::AzureRM::Storage::Files, @files.each
 
     multiple_values = lambda do |_container_name, options|
       if options[:marker] == 'marker'
@@ -104,7 +104,7 @@ class TestFiles < Minitest::Test
       @service.stub :list_blobs, multiple_values do
         j = 0
         @files.each do |file|
-          assert_instance_of Fog::Storage::AzureRM::File, file
+          assert_instance_of Fog::AzureRM::Storage::File, file
           j += 1
         end
         assert_equal @blob_list[:blobs].size, j
@@ -116,7 +116,7 @@ class TestFiles < Minitest::Test
     content = 'data'
     @service.stub :get_blob, [@blob, content] do
       file = @files.get('test_blob')
-      assert_instance_of Fog::Storage::AzureRM::File, file
+      assert_instance_of Fog::AzureRM::Storage::File, file
       assert_equal content, file.body
     end
   end
@@ -193,7 +193,7 @@ class TestFiles < Minitest::Test
   def test_head_method_success
     @service.stub :get_blob_properties, @blob do
       file = @files.head('test_blob')
-      assert_instance_of Fog::Storage::AzureRM::File, file
+      assert_instance_of Fog::AzureRM::Storage::File, file
       assert file.attributes[:body].nil?
     end
   end
@@ -222,7 +222,7 @@ class TestFiles < Minitest::Test
   end
 
   def test_new_method_success
-    assert_instance_of Fog::Storage::AzureRM::File, @files.new
+    assert_instance_of Fog::AzureRM::Storage::File, @files.new
   end
 
   def test_new_method_without_directory_exception

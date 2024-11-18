@@ -5,12 +5,12 @@ class TestWaitBlobCopyOperationToFinish < Minitest::Test
   # This class posesses the test cases for the requests of waiting storage blob copy operation to finish.
   def setup
     Fog.mock!
-    @mock_service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @mock_service = Fog::AzureRM::Storage.new(storage_account_credentials)
     Fog.unmock!
     @mocked_response = mocked_storage_http_error
     @blob = storage_blob
 
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
     @blob_client = @service.instance_variable_get(:@blob_client)
   end
 
@@ -49,7 +49,9 @@ class TestWaitBlobCopyOperationToFinish < Minitest::Test
     end
 
     @service.stub :get_blob_properties, multiple_values do
-      assert @service.wait_blob_copy_operation_to_finish('test_container', 'test_blob', copy_id, copy_status)
+      @service.stub :sleep, ->(delay) {} do
+        assert @service.wait_blob_copy_operation_to_finish('test_container', 'test_blob', copy_id, copy_status)
+      end
     end
   end
 
@@ -104,10 +106,17 @@ class TestWaitBlobCopyOperationToFinish < Minitest::Test
       @blob
     end
 
+    stubbed_times = [
+      Time.now,
+      Time.now + 5
+    ]
+
     @service.stub :get_blob_properties, multiple_values do
-      @service.stub :delete_blob, true do
-        assert_raises(TimeoutError) do
-          @service.wait_blob_copy_operation_to_finish('test_container', 'test_blob', copy_id, copy_status, 2)
+      Time.stub :new, -> { stubbed_times.shift } do
+        @service.stub :delete_blob, true do
+          assert_raises(Timeout::Error) do
+            @service.wait_blob_copy_operation_to_finish('test_container', 'test_blob', copy_id, copy_status, 2)
+          end
         end
       end
     end

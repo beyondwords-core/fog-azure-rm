@@ -1,12 +1,12 @@
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class provides the actual implementation for service calls.
       class Real
         def wait_blob_copy_operation_to_finish(container_name, blob_name, copy_id, copy_status, timeout = nil)
           begin
             start_time = Time.new
-            while copy_status == COPY_STATUS[:PENDING]
+            while copy_status == Fog::AzureRM::COPY_STATUS[:PENDING]
               blob = get_blob_properties(container_name, blob_name)
               blob_props = blob.properties
               if !copy_id.nil? && blob_props[:copy_id] != copy_id
@@ -15,10 +15,10 @@ module Fog
 
               copy_status_description = blob_props[:copy_status_description]
               copy_status = blob_props[:copy_status]
-              break if copy_status != COPY_STATUS[:PENDING]
+              break if copy_status != Fog::AzureRM::COPY_STATUS[:PENDING]
 
               elapse_time = Time.new - start_time
-              raise TimeoutError.new("The copy operation cannot be finished in #{timeout} seconds") if !timeout.nil? && elapse_time >= timeout
+              raise Timeout::Error.new("The copy operation cannot be finished in #{timeout} seconds") if !timeout.nil? && elapse_time >= timeout
 
               copied_bytes, total_bytes = blob_props[:copy_progress].split('/').map(&:to_i)
               interval = copied_bytes.zero? ? 5 : (total_bytes - copied_bytes).to_f / copied_bytes * elapse_time
@@ -27,7 +27,7 @@ module Fog
               sleep(interval)
             end
 
-            if copy_status != COPY_STATUS[:SUCCESS]
+            if copy_status != Fog::AzureRM::COPY_STATUS[:SUCCESS]
               raise "Failed to copy to #{container_name}/#{blob_name}: \n\tcopy status: #{copy_status}\n\tcopy description: #{copy_status_description}"
             end
           rescue

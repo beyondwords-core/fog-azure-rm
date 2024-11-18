@@ -3,8 +3,8 @@ require File.expand_path '../../test_helper', __dir__
 # Test class for Container Collection
 class TestDirectories < Minitest::Test
   def setup
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
-    @directories = Fog::Storage::AzureRM::Directories.new(service: @service)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
+    @directories = Fog::AzureRM::Storage::Directories.new(service: @service)
 
     @container_list = ApiStub::Models::Storage::Directory.container_list
     @container = ApiStub::Models::Storage::Directory.container
@@ -25,10 +25,10 @@ class TestDirectories < Minitest::Test
   def test_all_method_success
     @service.stub :list_containers, @container_list do
       dirs = @directories.all
-      assert_instance_of Fog::Storage::AzureRM::Directories, dirs
+      assert_instance_of Fog::AzureRM::Storage::Directories, dirs
       assert_equal @container_list.size, dirs.size
       dirs.each do |directory|
-        assert_instance_of Fog::Storage::AzureRM::Directory, directory
+        assert_instance_of Fog::AzureRM::Storage::Directory, directory
         assert_equal 'unknown', directory.attributes[:acl]
       end
     end
@@ -38,7 +38,7 @@ class TestDirectories < Minitest::Test
     @service.stub :get_container_properties, @container do
       @service.stub :list_blobs, @blob_list do
         directory = @directories.get('test_container')
-        assert_instance_of Fog::Storage::AzureRM::Directory, directory
+        assert_instance_of Fog::AzureRM::Storage::Directory, directory
         assert_equal 'unknown', directory.attributes[:acl]
       end
     end

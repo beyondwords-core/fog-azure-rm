@@ -8,28 +8,11 @@ require 'yaml'
 
 azure_credentials = YAML.load_file(File.expand_path('credentials/azure.yml', __dir__))
 
-rs = Fog::Resources::AzureRM.new(
-  tenant_id: azure_credentials['tenant_id'],
-  client_id: azure_credentials['client_id'],
-  client_secret: azure_credentials['client_secret'],
-  subscription_id: azure_credentials['subscription_id']
-)
-
-storage = Fog::Storage::AzureRM.new(
-  tenant_id: azure_credentials['tenant_id'],
-  client_id: azure_credentials['client_id'],
-  client_secret: azure_credentials['client_secret'],
-  subscription_id: azure_credentials['subscription_id'],
-  environment: azure_credentials['environment']
-)
-
 ########################################################################################################################
 ######################                               Resource names                                #####################
 ########################################################################################################################
 
-time = current_time
-resource_group_name = "Blob-RG-#{time}"
-storage_account_name = "sa#{time}"
+time = Time.now.to_i
 container_name = "con#{time}"
 test_container_name = "tcon#{time}"
 
@@ -38,25 +21,10 @@ test_container_name = "tcon#{time}"
 ########################################################################################################################
 
 begin
-  resource_group = rs.resource_groups.create(
-    name: resource_group_name,
-    location: LOCATION
-  )
-
-  storage_account_name = "sa#{current_time}"
-
-  storage_account = storage.storage_accounts.create(
-    name: storage_account_name,
-    location: LOCATION,
-    resource_group: resource_group_name
-  )
-
-  keys = storage_account.get_access_keys
-  access_key = keys.first.value
-
-  storage_data = Fog::Storage::AzureRM.new(
-    azure_storage_account_name: storage_account.name,
-    azure_storage_access_key: access_key,
+  storage_data = Fog::AzureRM::Storage.new(
+    azure_storage_account_name: azure_credentials['azure_storage_account_name'],
+    azure_storage_access_key: azure_credentials['azure_storage_access_key'],
+    azure_storage_endpoint: azure_credentials['azure_storage_endpoint'],
     environment: azure_credentials['environment']
   )
 
@@ -76,7 +44,7 @@ begin
   )
   puts "Created container: #{container.key}"
 
-  storage_data.directories.create(
+  container2 = storage_data.directories.create(
     key: test_container_name,
     public: true
   )
@@ -155,6 +123,7 @@ begin
   puts "Deleted container: #{container.destroy}"
 rescue => ex
   puts "Integration Test for container is failing: #{ex.inspect}\n#{ex.backtrace.join("\n")}"
+  raise
 ensure
-  resource_group.destroy unless resource_group.nil?
+  container2&.destroy
 end

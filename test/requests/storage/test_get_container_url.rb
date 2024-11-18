@@ -5,22 +5,19 @@ class TestGetContainerUrl < Minitest::Test
   # This class posesses the test cases for the requests of getting storage container url.
   def setup
     Fog.mock!
-    @mock_service = Fog::Storage::AzureRM.new(storage_account_credentials)
+    @mock_service = Fog::AzureRM::Storage.new(storage_account_credentials)
     Fog.unmock!
 
-    @service = Fog::Storage::AzureRM.new(storage_account_credentials)
-    @blob_client = @service.instance_variable_get(:@blob_client)
+    @service = Fog::AzureRM::Storage.new(storage_account_credentials)
 
     @url = ApiStub::Requests::Storage::Directory.container_https_url
   end
 
   def test_get_container_url_success
-    @blob_client.stub :generate_uri, @url do
-      assert_equal @url, @service.get_container_url('test_container')
+    assert_equal @url, @service.get_container_url('test_container')
 
-      options = { scheme: 'http' }
-      assert_equal @url.gsub('https:', 'http:'), @service.get_container_url('test_container', options)
-    end
+    options = { scheme: 'http' }
+    assert_equal @url.gsub('https:', 'http:'), @service.get_container_url('test_container', options)
   end
 
   def test_get_container_url_mock

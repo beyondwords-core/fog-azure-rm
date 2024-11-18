@@ -1,11 +1,13 @@
 require 'mime/types'
 
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class is giving implementation of create/save and
       # delete/destroy for Blob.
       class File < Fog::Model
+        include Fog::AzureRM::Utilities::General
+
         identity :key, aliases: %w(Name name Key)
 
         attr_writer :body
@@ -147,7 +149,7 @@ module Fog
         # @param options              [Hash] options for copy_object method
         # @option options [Integer] timeout Sets to raise a TimeoutError if the copy does not finish in timeout seconds.
         #
-        # @return [Fog::Storage::AzureRM::File] New File.
+        # @return [Fog::AzureRM::Storage::File] New File.
         #
         def copy(target_directory_key, target_file_key, options = {})
           requires :directory, :key
@@ -240,20 +242,26 @@ module Fog
         #
         def url(expires, options = {})
           requires :key
-          collection.get_url(key, expires, options)
+          collection.get_url(key, expires, normalize_options(options))
         end
 
         private
 
+        def normalize_options(options)
+          # AWS S3 and Google Cloud Storage pass response-content-disposition
+          # as a query string, while Azure needs the content_disposition parameter
+          # to generate a SAS token.
+          options = options.dup
+          options[:content_disposition] ||= options.dig(:query, 'response-content-disposition')
+          options[:content_type] ||= options.dig(:query, 'response-content-type')
+          options.delete(:query)
+          options
+        end
+
         # Upload blob
         def save_blob(options)
           if options[:blob_type].nil? || options[:blob_type] == 'BlockBlob'
-            if Fog::Storage.get_body_size(body) <= SINGLE_BLOB_PUT_THRESHOLD
-              service.create_block_blob(directory.key, key, body, options)
-            else
-              service.multipart_save_block_blob(directory.key, key, body, options)
-              service.get_blob_properties(directory.key, key)
-            end
+            service.create_block_blob(directory.key, key, body, options)
           else
             service.save_page_blob(directory.key, key, body, options)
             service.get_blob_properties(directory.key, key)

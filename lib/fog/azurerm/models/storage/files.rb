@@ -1,8 +1,10 @@
 module Fog
-  module Storage
-    class AzureRM
+  module AzureRM
+    class Storage
       # This class is giving implementation of listing blobs.
       class Files < Fog::Collection
+        include Fog::AzureRM::Utilities::General
+
         attribute :directory
         attribute :delimiter,       aliases: 'Delimiter'
         attribute :marker,          aliases: 'Marker'
@@ -10,7 +12,7 @@ module Fog
         attribute :next_marker,     aliases: %w(NextMarker next-marker)
         attribute :prefix,          aliases: 'Prefix'
 
-        model Fog::Storage::AzureRM::File
+        model Fog::AzureRM::Storage::File
 
         # List all files(blobs) under the directory.
         #
@@ -25,7 +27,7 @@ module Fog
         # @option options [String]  marker      Sets the identifier that specifies the portion of the list to be returned.
         # @option options [String]  prefix      Sets filters the results to return only files whose name begins with the specified prefix.
         #
-        # @return [Fog::Storage::AzureRM::Files] Return nil if the directory does not exist.
+        # @return [Fog::AzureRM::Storage::Files] Return nil if the directory does not exist.
         #
         def all(options = {})
           requires :directory
@@ -50,7 +52,7 @@ module Fog
 
         # Enumerate every file under the directory if block_given?
         #
-        # @return [Fog::Storage::AzureRM::Files]
+        # @return [Fog::AzureRM::Storage::Files]
         #
         alias each_file_this_page each
         def each
@@ -75,7 +77,7 @@ module Fog
         # @param options [Hash]
         # @option options [String]  block_size Sets buffer size when block_given? is true. Default is 32 MB
         #
-        # @return [Fog::Storage::AzureRM::File] A file. Return nil if the file does not exist.
+        # @return [Fog::AzureRM::Storage::File] A file. Return nil if the file does not exist.
         #
         def get(key, options = {}, &block)
           requires :directory
@@ -123,10 +125,10 @@ module Fog
         #
         # @return [String] A http URL.
         #
-        def get_http_url(key, expires, _options = {})
+        def get_http_url(key, expires, options = {})
           requires :directory
 
-          service.get_blob_http_url(directory.key, key, expires)
+          service.get_blob_http_url(directory.key, key, expires, options)
         end
 
         # Get the https URL of the file(blob) with the given name.
@@ -139,10 +141,10 @@ module Fog
         #
         # @return [String] A https URL.
         #
-        def get_https_url(key, expires, _options = {})
+        def get_https_url(key, expires, options = {})
           requires :directory
 
-          service.get_blob_https_url(directory.key, key, expires)
+          service.get_blob_https_url(directory.key, key, expires, options)
         end
 
         # Get the file(blob) without content with the given name.
@@ -152,7 +154,7 @@ module Fog
         # @param key     [String] Name of file
         # @param options [Hash]
         #
-        # @return [Fog::Storage::AzureRM::File] A file. Return nil if the file does not exist.
+        # @return [Fog::AzureRM::Storage::File] A file. Return nil if the file does not exist.
         #
         def head(key, options = {})
           requires :directory
@@ -170,7 +172,7 @@ module Fog
         #
         #     required attributes: directory
         #
-        # @return [Fog::Storage::AzureRM::File] A file. You need to use File.save to upload this new file.
+        # @return [Fog::AzureRM::Storage::File] A file. You need to use File.save to upload this new file.
         #
         def new(attributes = {})
           requires :directory

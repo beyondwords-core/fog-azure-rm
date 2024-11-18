@@ -8,28 +8,11 @@ require 'yaml'
 
 azure_credentials = YAML.load_file(File.expand_path('credentials/azure.yml', __dir__))
 
-rs = Fog::Resources::AzureRM.new(
-  tenant_id: azure_credentials['tenant_id'],
-  client_id: azure_credentials['client_id'],
-  client_secret: azure_credentials['client_secret'],
-  subscription_id: azure_credentials['subscription_id']
-)
-
-storage = Fog::Storage::AzureRM.new(
-  tenant_id: azure_credentials['tenant_id'],
-  client_id: azure_credentials['client_id'],
-  client_secret: azure_credentials['client_secret'],
-  subscription_id: azure_credentials['subscription_id'],
-  environment: azure_credentials['environment']
-)
-
 ########################################################################################################################
 ######################                               Resource names                                #####################
 ########################################################################################################################
 
-time = current_time
-resource_group_name = "Blob-RG-#{time}"
-storage_account_name = "sa#{time}"
+time = Time.now.to_i
 container_name = "con#{time}"
 test_container_name = "tcon#{time}"
 
@@ -38,36 +21,25 @@ test_container_name = "tcon#{time}"
 ########################################################################################################################
 
 begin
-  resource_group = rs.resource_groups.create(
-    name: resource_group_name,
-    location: LOCATION
-  )
-
-  storage_account = storage.storage_accounts.create(
-    name: storage_account_name,
-    location: LOCATION,
-    resource_group: resource_group_name
-  )
-
-  access_key = storage_account.get_access_keys[0].value
-  Fog::Logger.debug access_key.inspect
   storage_data = Fog::Storage.new(
     provider: 'AzureRM',
-    azure_storage_account_name: storage_account.name,
-    azure_storage_access_key: access_key,
+    azure_storage_account_name: azure_credentials['azure_storage_account_name'],
+    azure_storage_access_key: azure_credentials['azure_storage_access_key'],
+    azure_storage_endpoint: azure_credentials['azure_storage_endpoint'],
     environment: azure_credentials['environment']
   )
+  scheme = URI.parse(azure_credentials.fetch('azure_storage_endpoint', 'https:')).scheme
 
   ########################################################################################################################
   ######################                                Create Container                            ######################
   ########################################################################################################################
 
-  storage_data.directories.create(
+  test_container1 = storage_data.directories.create(
     key: container_name,
     public: true
   )
 
-  storage_data.directories.create(
+  test_container2 = storage_data.directories.create(
     key: test_container_name,
     public: false
   )
@@ -271,6 +243,24 @@ begin
   puts "Get a http URL with expires: #{test_blob.url(Time.now + 3600, scheme: 'http')}"
 
   ########################################################################################################################
+  ######################                            Test generated GET and PUT URLs                 ######################
+  ########################################################################################################################
+
+  url_blob_name = 'url-test.txt'
+  url_blob_content = 'Hello world.'
+  get_url = storage_data.public_send("get_blob_#{scheme}_url", container_name, url_blob_name, Time.now + 3600)
+  put_url = storage_data.public_send("put_blob_#{scheme}_url", container_name, url_blob_name, Time.now + 3600)
+
+  response = Faraday.put(put_url, url_blob_content, 'x-ms-blob-type' => 'BlockBlob')
+  raise unless response.success?
+  puts 'Uploaded blob using PUT blob URL'
+
+  response = Faraday.get(get_url)
+  raise unless response.success?
+  raise unless response.body == url_blob_content
+  puts 'Downloaded blob using GET blob URL'
+
+  ########################################################################################################################
   ######################                            Lease Blob                                      ######################
   ########################################################################################################################
 
@@ -292,6 +282,8 @@ begin
   puts "Deleted blob: #{blob.destroy}"
 rescue => ex
   puts "Integration Test for blob is failing: #{ex.inspect}\n#{ex.backtrace.join("\n")}"
+  raise
 ensure
-  resource_group.destroy unless resource_group.nil?
+  test_container1&.destroy
+  test_container2&.destroy
 end
