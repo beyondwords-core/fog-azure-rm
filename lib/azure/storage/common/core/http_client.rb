@@ -26,6 +26,8 @@
 
 module Azure::Storage::Common::Core
   module HttpClient
+    DEFAULT_POOL_SIZE = 5
+
     # Returns the http agent based on uri
     # @param uri  [URI|String] the base uri (scheme, host, port) of the http endpoint
     # @return [Net::HTTP] http agent for a given uri
@@ -70,9 +72,11 @@ module Azure::Storage::Common::Core
                         elsif ENV["HTTPS_PROXY"]
                           URI::parse(ENV["HTTPS_PROXY"])
                         end || nil
+        pool_size = self.http_pool_size || DEFAULT_POOL_SIZE
+
         Faraday.new(uri, ssl: ssl_options, proxy: proxy_options) do |conn|
           conn.response :follow_redirects
-          conn.adapter :net_http_persistent, pool_size: 50 do |http|
+          conn.adapter :net_http_persistent, pool_size: pool_size do |http|
             # yields Net::HTTP::Persistent
             http.idle_timeout = 100
           end

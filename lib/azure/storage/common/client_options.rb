@@ -30,7 +30,7 @@ require "azure/storage/common/core/auth/anonymous_signer"
 
 module Azure::Storage::Common
   module ClientOptions
-    attr_accessor :ca_file, :ssl_version, :ssl_min_version, :ssl_max_version
+    attr_accessor :ca_file, :ssl_version, :ssl_min_version, :ssl_max_version, :http_pool_size
 
     # Public: Reset options for [Azure::Storage::Common::Client]
     #
@@ -91,6 +91,7 @@ module Azure::Storage::Common
       @ssl_version = options.delete(:ssl_version)
       @ssl_min_version = options.delete(:ssl_min_version)
       @ssl_max_version = options.delete(:ssl_max_version)
+      @http_pool_size = options.delete(:http_pool_size)
       @options = filter(options)
       self.send(:reset_config!, @options) if self.respond_to?(:reset_config!)
       self

@@ -8,6 +8,7 @@ module Fog
       recognizes :azure_storage_token_signer
       recognizes :azure_storage_endpoint
       recognizes :azure_storage_domain
+      recognizes :azure_storage_http_pool_size
       recognizes :environment
 
       recognizes :debug
@@ -117,7 +118,8 @@ module Fog
           azure_client = Azure::Storage::Common::Client.create({
             storage_account_name: @azure_storage_account_name,
             storage_access_key: @azure_storage_access_key,
-            signer: @azure_storage_token_signer
+            signer: @azure_storage_token_signer,
+            http_pool_size: options[:azure_storage_http_pool_size]
           }.compact)
           azure_client.storage_blob_host = storage_blob_host
           @blob_client = Azure::Storage::Blob::BlobService.new(client: azure_client)
