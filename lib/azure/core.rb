@@ -18,6 +18,7 @@ require 'nokogiri'
 require 'faraday'
 require 'faraday/follow_redirects'
 require 'faraday/net_http_persistent'
+require 'faraday/retry'
 
 module Azure
   module Core

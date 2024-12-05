@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'faraday', "~> 2.0"
   spec.add_dependency "faraday-follow_redirects", "~> 0.3.0"
   spec.add_dependency "faraday-net_http_persistent", "~> 2.0"
+  spec.add_dependency "faraday-retry", "~> 2.2.1"
   spec.add_dependency 'fog-core', '~> 2.1'
   spec.add_dependency 'fog-json', '~> 1.2'
   spec.add_dependency 'mime-types'

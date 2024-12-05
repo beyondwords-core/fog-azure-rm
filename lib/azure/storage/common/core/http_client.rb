@@ -75,6 +75,18 @@ module Azure::Storage::Common::Core
         pool_size = self.http_pool_size || DEFAULT_POOL_SIZE
 
         Faraday.new(uri, ssl: ssl_options, proxy: proxy_options) do |conn|
+          conn.request :retry,
+                       max: 3,
+                       interval: 2,
+                       backoff_factor: 4,
+                       exceptions: [
+                         Errno::ETIMEDOUT,
+                         Timeout::Error,
+                         Faraday::TimeoutError,
+                         Faraday::SSLError,
+                         Faraday::ConnectionFailed,
+                         Fog::AzureRM::CustomAzureCoreHttpError
+                       ]
           conn.response :follow_redirects
           conn.adapter :net_http_persistent, pool_size: pool_size do |http|
             # yields Net::HTTP::Persistent
