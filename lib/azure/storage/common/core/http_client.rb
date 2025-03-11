@@ -84,8 +84,7 @@ module Azure::Storage::Common::Core
                          Timeout::Error,
                          Faraday::TimeoutError,
                          Faraday::SSLError,
-                         Faraday::ConnectionFailed,
-                         Fog::AzureRM::CustomAzureCoreHttpError
+                         Faraday::ConnectionFailed
                        ]
           conn.response :follow_redirects
           conn.adapter :net_http_persistent, pool_size: pool_size do |http|
